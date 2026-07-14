@@ -8,12 +8,25 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+
+type Department = {
+    id: number;
+    name: string;
+};
 
 type Props = {
     passwordRules: string;
+    departments: Department[];
 };
 
-export default function Register({ passwordRules }: Props) {
+export default function Register({ passwordRules, departments }: Props) {
     return (
         <>
             <Head title="Register" />
@@ -26,78 +39,163 @@ export default function Register({ passwordRules }: Props) {
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="name"
-                                    name="name"
-                                    placeholder="Full name"
-                                />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
+                            {/* Name + Contact */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="name">Full Name</Label>
+                                    <Input
+                                        id="name"
+                                        name="name"
+                                        placeholder="Juan Dela Cruz"
+                                        required
+                                        autoFocus
+                                    />
+                                    <InputError message={errors.name} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="contact_number">
+                                        Contact Number
+                                    </Label>
+                                    <Input
+                                        id="contact_number"
+                                        name="contact_number"
+                                        placeholder="09XXXXXXXXX"
+                                    />
+                                    <InputError
+                                        message={errors.contact_number}
+                                    />
+                                </div>
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="email"
-                                    name="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
+                            {/* Email + Sex */}
+
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">Email Address</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        placeholder="intern@usep.edu.ph"
+                                        required
+                                    />
+                                    <InputError message={errors.email} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="sex">Sex</Label>
+
+                                    <select
+                                        id="sex"
+                                        name="sex"
+                                        required
+                                        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    >
+                                        <option value="">Select Sex</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+
+                                    <InputError message={errors.sex} />
+                                </div>
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
-                                <PasswordInput
-                                    id="password"
-                                    required
-                                    tabIndex={3}
-                                    autoComplete="new-password"
-                                    name="password"
-                                    placeholder="Password"
-                                    passwordrules={passwordRules}
-                                />
-                                <InputError message={errors.password} />
+                            {/* Department */}
+
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                {/* Department */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="department_id">
+                                        Assigned Department
+                                    </Label>
+
+                                    <select
+                                        id="department_id"
+                                        name="department_id"
+                                        required
+                                        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    >
+                                        <option value="">
+                                            Select Department
+                                        </option>
+
+                                        {departments.map((department) => (
+                                            <option
+                                                key={department.id}
+                                                value={department.id}
+                                            >
+                                                {department.name}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <InputError
+                                        message={errors.department_id}
+                                    />
+                                </div>
+
+                                {/* Program */}
+                                <div className="grid gap-2">
+                                    <Label htmlFor="section">Program</Label>
+
+                                    <select
+                                        id="section"
+                                        name="section"
+                                        required
+                                        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    >
+                                        <option value="">Select Program</option>
+                                        <option value="BSCS">BSCS</option>
+                                        <option value="BSIT-IS">BSIT-IS</option>
+                                        <option value="BSIT-BTM">
+                                            BSIT-BTM
+                                        </option>
+                                    </select>
+
+                                    <InputError message={errors.section} />
+                                </div>
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    required
-                                    tabIndex={4}
-                                    autoComplete="new-password"
-                                    name="password_confirmation"
-                                    placeholder="Confirm password"
-                                    passwordrules={passwordRules}
-                                />
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
+                            {/* Passwords */}
+
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password">Password</Label>
+
+                                    <PasswordInput
+                                        id="password"
+                                        name="password"
+                                        placeholder="Password"
+                                        passwordrules={passwordRules}
+                                        required
+                                    />
+
+                                    <InputError message={errors.password} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password_confirmation">
+                                        Confirm Password
+                                    </Label>
+
+                                    <PasswordInput
+                                        id="password_confirmation"
+                                        name="password_confirmation"
+                                        placeholder="Confirm Password"
+                                        passwordrules={passwordRules}
+                                        required
+                                    />
+
+                                    <InputError
+                                        message={errors.password_confirmation}
+                                    />
+                                </div>
                             </div>
 
-                            <Button
-                                type="submit"
-                                className="mt-2 w-full"
-                                tabIndex={5}
-                                data-test="register-user-button"
-                            >
+                            <Button type="submit" className="w-full">
                                 {processing && <Spinner />}
-                                Create account
+                                Create Account
                             </Button>
                         </div>
 

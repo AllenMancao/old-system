@@ -14,6 +14,7 @@ use Illuminate\Support\Carbon;
 use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -29,7 +30,16 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable([
+    'name',
+    'email',
+    'contact_number',
+    'sex',
+    'department_id',
+    'section',
+    'password',
+    'role',
+])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -50,17 +60,15 @@ class User extends Authenticatable implements PasskeyUser
         ];
     }
 
+
     /**
      * QR sessions this user has generated (only applies if role = supervisor).
      */
-    public function qrSessions(): HasMany
+public function qrSessions(): HasMany
     {
         return $this->hasMany(QrSession::class, 'supervisor_id');
     }
 
-    /**
-     * Attendance logs belonging to this user (only applies if role = intern).
-     */
     public function attendanceLogs(): HasMany
     {
         return $this->hasMany(AttendanceLog::class, 'intern_id');
@@ -75,4 +83,10 @@ class User extends Authenticatable implements PasskeyUser
     {
         return $this->role === 'intern';
     }
+
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
 }
+
