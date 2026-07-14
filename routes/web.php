@@ -9,3 +9,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+require __DIR__.'/attendance.php';
+require __DIR__.'/intern-profile.php';
+require __DIR__.'/supervisor-dashboard.php';
