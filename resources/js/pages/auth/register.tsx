@@ -16,11 +16,17 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
-type Props = {
-    passwordRules: string;
+type Department = {
+    id: number;
+    name: string;
 };
 
-export default function Register({ passwordRules }: Props) {
+type Props = {
+    passwordRules: string;
+    departments: Department[];
+};
+
+export default function Register({ passwordRules, departments }: Props) {
     return (
         <>
             <Head title="Register" />
@@ -78,22 +84,18 @@ export default function Register({ passwordRules }: Props) {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label>Sex</Label>
+                                    <Label htmlFor="sex">Sex</Label>
 
-                                    <Select>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select Sex" />
-                                        </SelectTrigger>
-
-                                        <SelectContent>
-                                            <SelectItem value="male">
-                                                Male
-                                            </SelectItem>
-                                            <SelectItem value="female">
-                                                Female
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <select
+                                        id="sex"
+                                        name="sex"
+                                        required
+                                        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    >
+                                        <option value="">Select Sex</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
 
                                     <InputError message={errors.sex} />
                                 </div>
@@ -104,55 +106,52 @@ export default function Register({ passwordRules }: Props) {
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 {/* Department */}
                                 <div className="grid gap-2">
-                                    <Label htmlFor="department">
+                                    <Label htmlFor="department_id">
                                         Assigned Department
                                     </Label>
 
-                                    <Select>
-                                        <SelectTrigger id="department">
-                                            <SelectValue placeholder="Select Department" />
-                                        </SelectTrigger>
+                                    <select
+                                        id="department_id"
+                                        name="department_id"
+                                        required
+                                        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    >
+                                        <option value="">
+                                            Select Department
+                                        </option>
 
-                                        <SelectContent>
-                                            <SelectItem value="cic">
-                                                CIC
-                                            </SelectItem>
-                                            <SelectItem value="registrar">
-                                                KTTD
-                                            </SelectItem>
-                                            <SelectItem value="hr">
-                                                SMU
-                                            </SelectItem>
-                                            <SelectItem value="hr">
-                                                MCIIS
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                        {departments.map((department) => (
+                                            <option
+                                                key={department.id}
+                                                value={department.id}
+                                            >
+                                                {department.name}
+                                            </option>
+                                        ))}
+                                    </select>
 
-                                    <InputError message={errors.department} />
+                                    <InputError
+                                        message={errors.department_id}
+                                    />
                                 </div>
 
-                                {/* Section */}
+                                {/* Program */}
                                 <div className="grid gap-2">
                                     <Label htmlFor="section">Program</Label>
 
-                                    <Select>
-                                        <SelectTrigger id="section">
-                                            <SelectValue placeholder="Select Section" />
-                                        </SelectTrigger>
-
-                                        <SelectContent>
-                                            <SelectItem value="bsit4a">
-                                                BSCS
-                                            </SelectItem>
-                                            <SelectItem value="bsit4b">
-                                                BSIT-IS
-                                            </SelectItem>
-                                            <SelectItem value="bsit4b">
-                                                BSIT-BTM
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <select
+                                        id="section"
+                                        name="section"
+                                        required
+                                        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    >
+                                        <option value="">Select Program</option>
+                                        <option value="BSCS">BSCS</option>
+                                        <option value="BSIT-IS">BSIT-IS</option>
+                                        <option value="BSIT-BTM">
+                                            BSIT-BTM
+                                        </option>
+                                    </select>
 
                                     <InputError message={errors.section} />
                                 </div>
