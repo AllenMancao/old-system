@@ -42,7 +42,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder="intern.email@usep.edu.ph"
                                 />
                                 <InputError message={errors.email} />
                             </div>
