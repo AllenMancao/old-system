@@ -14,6 +14,9 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
 use App\Models\Department;
+use App\Models\Course;
+use App\Http\Responses\LoginResponse;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -21,9 +24,9 @@ class FortifyServiceProvider extends ServiceProvider
      * Register any application services.
      */
     public function register(): void
-    {
-        //
-    }
+{
+    $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
+}
 
     /**
      * Bootstrap any application services.
@@ -69,9 +72,10 @@ class FortifyServiceProvider extends ServiceProvider
         ]));
 
         Fortify::registerView(fn () => Inertia::render('auth/register', [
-            'passwordRules' => Password::defaults()->toPasswordRulesString(),
-            'departments' => Department::orderBy('name')->get(),
-        ]));
+    'passwordRules' => Password::defaults()->toPasswordRulesString(),
+    'departments' => Department::orderBy('name')->get(),
+    'courses' => Course::orderBy('course_code')->get(),
+]));
 
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
 

@@ -20,13 +20,17 @@ type Department = {
     id: number;
     name: string;
 };
-
+type Course = {
+    id: number;
+    course_code: string;
+};
 type Props = {
     passwordRules: string;
     departments: Department[];
+    courses: Course[];
 };
 
-export default function Register({ passwordRules, departments }: Props) {
+export default function Register({ passwordRules, departments, courses }: Props) {
     return (
         <>
             <Head title="Register" />
@@ -67,6 +71,16 @@ export default function Register({ passwordRules, departments }: Props) {
                                     />
                                 </div>
                             </div>
+                            <div className="grid gap-2">
+    <Label htmlFor="student_number">Student Number</Label>
+    <Input
+        id="student_number"
+        name="student_number"
+        placeholder="2021-00123"
+        required
+    />
+    <InputError message={errors.student_number} />
+</div>
 
                             {/* Email + Sex */}
 
@@ -135,26 +149,26 @@ export default function Register({ passwordRules, departments }: Props) {
                                     />
                                 </div>
 
-                                {/* Program */}
-                                <div className="grid gap-2">
-                                    <Label htmlFor="section">Program</Label>
+                                {/* Course */}
+<div className="grid gap-2">
+    <Label htmlFor="course_id">Course / Program</Label>
 
-                                    <select
-                                        id="section"
-                                        name="section"
-                                        required
-                                        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                                    >
-                                        <option value="">Select Program</option>
-                                        <option value="BSCS">BSCS</option>
-                                        <option value="BSIT-IS">BSIT-IS</option>
-                                        <option value="BSIT-BTM">
-                                            BSIT-BTM
-                                        </option>
-                                    </select>
+    <select
+        id="course_id"
+        name="course_id"
+        required
+        className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+    >
+        <option value="">Select Course</option>
+        {courses.map((course) => (
+            <option key={course.id} value={course.id}>
+                {course.course_code}
+            </option>
+        ))}
+    </select>
 
-                                    <InputError message={errors.section} />
-                                </div>
+    <InputError message={errors.course_id} />
+</div>
                             </div>
 
                             {/* Passwords */}

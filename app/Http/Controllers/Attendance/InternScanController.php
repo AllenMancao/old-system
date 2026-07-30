@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Attendance;
 
 use App\Http\Controllers\Controller;
 use App\Models\AttendanceLog;
-use App\Models\QrSession;
-use Carbon\Carbon;
+use App\Models\QRSession;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,7 +22,7 @@ class InternScanController extends Controller
             'token' => 'required|string',
         ]);
 
-        $qrSession = QrSession::where('token', $validated['token'])->first();
+        $qrSession = QRSession::where('token', $validated['token'])->first();
 
         if (! $qrSession) {
             return back()->withErrors(['token' => 'Invalid QR code.']);
@@ -33,31 +32,38 @@ class InternScanController extends Controller
             return back()->withErrors(['token' => 'This QR code has expired. Ask your supervisor to refresh it.']);
         }
 
-        $intern = $request->user();
+        $profile = $request->user()->internProfile;
+
+        if (! $profile) {
+            return back()->withErrors(['token' => 'No intern profile is set up for your account yet.']);
+        }
+
         $today = now()->toDateString();
 
-        $log = AttendanceLog::firstOrNew([
-            'intern_id' => $intern->id,
-            'date' => $today,
-        ]);
+        $log = AttendanceLog::where('intern_profile_id', $profile->id)
+            ->whereDate('date', $today)
+            ->first();
 
-        if (! $log->exists) {
-            $log->time_in = now()->toTimeString();
-            $log->status = 'ongoing';
+        if (! $log) {
+            $log = new AttendanceLog([
+                'intern_profile_id' => $profile->id,
+                'date' => $today,
+                'time_in' => now(),
+                'status' => 'Incomplete',
+            ]);
             $log->save();
 
             return back()->with('success', 'Timed in successfully at '.now()->format('g:i A'));
         }
 
-        if ($log->status === 'ongoing' && ! $log->time_out) {
-            $log->time_out = now()->toTimeString();
-            $log->status = 'completed';
-
-            $timeIn = Carbon::parse($log->date->toDateString().' '.$log->time_in);
-            $timeOut = Carbon::parse($log->date->toDateString().' '.$log->time_out);
-            $log->rendered_hours = round($timeOut->diffInMinutes($timeIn) / 60, 2);
-
+        if ($log->status === 'Incomplete' && ! $log->time_out) {
+            $log->time_out = now();
+            // TODO: Present vs Late needs a cutoff time the team hasn't defined yet.
+            $log->status = 'Present';
+            $log->rendered_hours = round($log->time_out->diffInMinutes($log->time_in) / 60, 2);
             $log->save();
+
+            $profile->increment('current_hours', $log->rendered_hours);
 
             return back()->with('success', 'Timed out successfully at '.now()->format('g:i A'));
         }

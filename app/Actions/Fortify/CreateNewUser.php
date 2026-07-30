@@ -4,6 +4,8 @@ namespace App\Actions\Fortify;
 
 use App\Concerns\PasswordValidationRules;
 use App\Concerns\ProfileValidationRules;
+use App\Models\Course;
+use App\Models\InternProfile;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -12,42 +14,37 @@ class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules, ProfileValidationRules;
 
-    /**
-     * Validate and create a newly registered user.
-     *
-     * @param  array<string, string>  $input
-     */
     public function create(array $input): User
     {
         Validator::make($input, [
-    ...$this->profileRules(),
+            ...$this->profileRules(),
+            'contact_number' => ['required', 'string', 'max:20'],
+            'sex' => ['required', 'in:Male,Female'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'course_id' => ['required', 'exists:courses,id'],
+            'student_number' => ['required', 'string', 'max:50', 'unique:intern_profiles,student_number'],
+            'password' => $this->passwordRules(),
+        ])->validate();
 
-    'contact_number' => ['required', 'string', 'max:20'],
+        $course = Course::findOrFail($input['course_id']);
 
-    'sex' => ['required', 'in:Male,Female'],
+        $user = User::create([
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'contact_number' => $input['contact_number'],
+            'sex' => $input['sex'],
+            'department_id' => $input['department_id'],
+            'role' => 'intern',
+            'password' => $input['password'],
+        ]);
 
-    'department_id' => ['required', 'exists:departments,id'],
+        InternProfile::create([
+            'user_id' => $user->id,
+            'course_id' => $course->id,
+            'student_number' => $input['student_number'],
+            'required_hours' => $course->required_hours,
+        ]);
 
-    'section' => ['required', 'string', 'max:50'],
-
-    'password' => $this->passwordRules(),
-
-    ])->validate();
-
-            return User::create([
-        'name' => $input['name'],
-
-        'email' => $input['email'],
-
-        'contact_number' => $input['contact_number'],
-
-        'sex' => $input['sex'],
-
-        'department_id' => $input['department_id'],
-
-        'section' => $input['section'],
-
-        'password' => $input['password'],
-    ]);
+        return $user;
     }
 }

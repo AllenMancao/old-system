@@ -15,6 +15,7 @@ use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -64,29 +65,30 @@ class User extends Authenticatable implements PasskeyUser
     /**
      * QR sessions this user has generated (only applies if role = supervisor).
      */
+public function internProfile(): HasOne
+{
+    return $this->hasOne(InternProfile::class);
+}
+
 public function qrSessions(): HasMany
-    {
-        return $this->hasMany(QrSession::class, 'supervisor_id');
-    }
+{
+    return $this->hasMany(QRSession::class, 'hte_supervisor_id');
+}
 
-    public function attendanceLogs(): HasMany
-    {
-        return $this->hasMany(AttendanceLog::class, 'intern_id');
-    }
+public function isHteSupervisor(): bool
+{
+    return $this->role === 'hte_supervisor';
+}
 
-    public function isSupervisor(): bool
-    {
-        return $this->role === 'supervisor';
-    }
+public function isOjtSupervisor(): bool
+{
+    return $this->role === 'ojt_supervisor';
+}
 
-    public function isIntern(): bool
-    {
-        return $this->role === 'intern';
-    }
-
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class);
-    }
+public function isIntern(): bool
+{
+    return $this->role === 'intern';
+}
+        
 }
 

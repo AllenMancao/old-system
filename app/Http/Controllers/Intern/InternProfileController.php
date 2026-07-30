@@ -11,21 +11,30 @@ class InternProfileController extends Controller
 {
     public function index(Request $request): Response
     {
-        // TODO: replace with real query once intern_profiles migration
-        // (Suboan-Branch) is merged: IternProfile::where('user_id', $request->user()->id)->first()
+        $internProfile = $request->user()
+            ->internProfile()
+            ->with(['course', 'hteUnit.supervisor'])
+            ->first();
+
+        if (! $internProfile) {
+            return Inertia::render('intern/profile', [
+                'profile' => null,
+            ]);
+        }
+
         $profile = [
             'name' => $request->user()->name,
             'email' => $request->user()->email,
-            'student_number' => '2021-00123',
-            'course' => 'BSIT - Business Technology Management',
-            'company' => 'Sample Host Company Inc.',
-            'supervisor' => 'Test Supervisor',
-            'year_level' => 4,
-            'start_date' => '2026-06-01',
-            'end_date' => '2026-09-30',
-            'required_hours' => 486,
-            'current_hours' => 128.5,
-            'status' => 'Active',
+            'student_number' => $internProfile->student_number,
+            'course' => $internProfile->course->course_name,
+            'company' => $internProfile->hteUnit->unit_name ?? 'Not yet assigned',
+            'supervisor' => $internProfile->hteUnit->supervisor->name ?? 'Not yet assigned',
+            'year_level' => 4, // TODO: no year_level column exists on intern_profiles yet — flagged to Suboan
+            'start_date' => $internProfile->start_date?->toDateString(),
+            'end_date' => $internProfile->end_date?->toDateString(),
+            'required_hours' => $internProfile->required_hours,
+            'current_hours' => (float) $internProfile->current_hours,
+            'status' => $internProfile->status,
         ];
 
         return Inertia::render('intern/profile', [

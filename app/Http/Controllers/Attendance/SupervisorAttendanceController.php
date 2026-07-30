@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Attendance;
 
 use App\Http\Controllers\Controller;
-use App\Models\QrSession;
+use App\Models\QRSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -25,10 +25,16 @@ class SupervisorAttendanceController extends Controller
 
     private function freshToken(Request $request): array
     {
-        $session = QrSession::create([
+        // deactivate this supervisor's previous session, since is_active is new
+        QRSession::where('hte_supervisor_id', $request->user()->id)
+            ->where('is_active', true)
+            ->update(['is_active' => false]);
+
+        $session = QRSession::create([
+            'hte_supervisor_id' => $request->user()->id,
             'token' => Str::random(40),
-            'supervisor_id' => $request->user()->id,
             'expires_at' => now()->addSeconds(20),
+            'is_active' => true,
         ]);
 
         return [

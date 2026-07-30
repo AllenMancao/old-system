@@ -6,19 +6,27 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('qr_sessions', function (Blueprint $table) {
             $table->id();
-            $table->string('token', 64)->unique();
-            $table->foreignId('supervisor_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('hte_supervisor_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
+            $table->string('token')->unique();
             $table->timestamp('expires_at');
+            $table->boolean('is_active')
+                ->default(true);
             $table->timestamps();
-
-            $table->index(['token', 'expires_at']);
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('qr_sessions');
